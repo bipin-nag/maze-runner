@@ -2,16 +2,43 @@ d = 32
 
 width = height = d
 
-LX = Table[Line[{{i, j}, {i + 1, j}}], {i, width}, {j, width}]
+EX = Table[{i, j} <-> {i + 1, j}, {i, width}, {j, width}]
 
-LY = Table[Line[{{i, j}, {i, j + 1}}], {i, width}, {j, width}]
+EY = Table[{i, j} <-> {i, j + 1}, {i, width}, {j, width}]
 
 p = 0.40
 
 q = 0.60
 
-Lx = RandomChoice[{p, 1 - p} -> {#, {}}]& /@ Flatten @ LX
+Ex = RandomChoice[{p, 1 - p} -> {#, {}}]& /@ Flatten @ EX
 
-Ly = RandomChoice[{q, 1 - q} -> {#, {}}]& /@ Flatten @ LY
+Ex = Cases[Except[{}]][Ex]
 
-Graphics[Join[Lx, Ly]]
+Ey = RandomChoice[{q, 1 - q} -> {#, {}}]& /@ Flatten @ EY
+
+Ey = Cases[Except[{}]][Ey]
+
+g = Graph[Join[Ex, Ey]]
+
+walls =
+    Table[
+        {
+            If[EdgeQ[g, {i, j} <-> {i + 1, j}],
+                {Line[{{i, j}, {i + 1, j}}]}
+                ,
+                {}
+            ]
+            ,
+            If[EdgeQ[g, {i, j} <-> {i, j + 1}],
+                {Line[{{i, j}, {i, j + 1}}]}
+                ,
+                {}
+            ]
+        }
+        ,
+        {i, width}
+        ,
+        {j, height}
+    ]; 
+
+Graphics[walls]
